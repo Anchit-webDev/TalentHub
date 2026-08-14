@@ -1,0 +1,88 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String          @id // Maps to Supabase auth.users.id UUID
+  name              String?
+  email             String?         @unique
+  phone             String?         @unique
+  role              String          // 'creator' | 'client' | 'admin'
+  city              String?
+  preferredLanguage String          @default("en") // 'en' | 'hi'
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  creatorProfile    CreatorProfile?
+  clientInquiries   Inquiry[]       @relation("ClientInquiries")
+  creatorInquiries  Inquiry[]       @relation("CreatorInquiries")
+}
+
+model CreatorProfile {
+  userId          String          @id @unique
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories      String[]        // Stored as string array in PostgreSQL
+  bio             String
+  city            String
+  priceRangeMin   Float
+  priceRangeMax   Float
+  serviceType     String          // 'booking' | 'content' | 'both'
+  verified        Boolean         @default(false)
+  instagramUrl    String?
+  youtubeUrl      String?
+  whatsappNumber  String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  portfolioItems  PortfolioItem[]
+}
+
+model PortfolioItem {
+  id               String         @id @default(uuid())
+  creatorProfileId String
+  creatorProfile   CreatorProfile @relation(fields: [creatorProfileId], references: [userId], onDelete: Cascade)
+  mediaUrl         String
+  mediaType        String         // 'image' | 'video' | 'embed'
+  caption          String?
+  order            Int            @default(0)
+  createdAt        DateTime       @default(now())
+}
+
+model Inquiry {
+  id          String    @id @default(uuid())
+  creatorId   String
+  creator     User      @relation("CreatorInquiries", fields: [creatorId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      User      @relation("ClientInquiries", fields: [clientId], references: [id], onDelete: Cascade)
+  category    String
+  eventDate   DateTime?
+  message     String
+  status      String    // 'pending' | 'accepted' | 'declined' | 'completed'
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  reviews     Review[]
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  inquiryId String   @unique
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  rating    Int      // 1 to 5
+  comment   String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          String @id @default(uuid())
+  name        String
+  slug        String @unique
+  icon        String // Lucide icon name or emoji representation
+  serviceType String // 'booking' | 'content' | 'both'
+}
