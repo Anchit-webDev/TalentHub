@@ -13,6 +13,63 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Missing creator ID' }, { status: 400 });
     }
 
+    // Offline Dev Mode Fallback:
+    // If using mock credentials, return deterministic creator profile details instead of crashing!
+    if (id.startsWith('mock-')) {
+      const mockCreator = {
+        id,
+        name: 'Priya Mehandi Designer',
+        city: 'Delhi NCR',
+        phone: '+919876543210',
+        creatorProfile: {
+          userId: id,
+          categories: ['Mehndi Artist', 'Bridal Makeup'],
+          bio: 'Specialist in beautiful designer bridal mehndi, Arabic mehndi patterns, and traditional festival mehndi layouts. Over 5 years of verified experience styling top weddings in Delhi NCR.',
+          city: 'Delhi NCR',
+          priceRangeMin: 5000,
+          priceRangeMax: 15000,
+          serviceType: 'booking',
+          verified: true,
+          instagramUrl: 'https://instagram.com',
+          youtubeUrl: 'https://youtube.com',
+          whatsappNumber: '919876543210',
+          portfolioItems: [
+            {
+              id: 'p1',
+              mediaUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=600',
+              mediaType: 'image',
+              caption: 'Bridal Mehndi Full Hand design',
+            },
+            {
+              id: 'p2',
+              mediaUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=600',
+              mediaType: 'image',
+              caption: 'Elegant Arabic Pattern',
+            }
+          ]
+        }
+      };
+
+      return NextResponse.json({
+        creator: mockCreator,
+        reviews: [
+          {
+            id: 'rev1',
+            rating: 5,
+            comment: 'Absolutely stunning work! Priya designed my wedding mehndi and everyone loved the patterns.',
+            createdAt: new Date().toISOString(),
+            inquiry: {
+              client: {
+                name: 'Anjali Sharma',
+              }
+            }
+          }
+        ],
+        canReview: true,
+        eligibleInquiryId: 'mock-inquiry-123',
+      });
+    }
+
     const creator = await prisma.user.findFirst({
       where: { id, role: 'creator' },
       include: {

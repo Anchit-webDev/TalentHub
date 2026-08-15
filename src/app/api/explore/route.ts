@@ -51,7 +51,7 @@ export async function GET(request: Request) {
         role: 'creator',
         creatorProfile: {
           isNot: null,
-          ...profileFilters,
+          is: Object.keys(profileFilters).length > 0 ? profileFilters : undefined,
         },
       },
       include: {

@@ -103,6 +103,8 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
   const [data, setData] = useState<CreatorDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [inquiryError, setInquiryError] = useState('');
+  const [reviewError, setReviewError] = useState('');
 
   // Active Tab state
   const [activeTab, setActiveTab] = useState<'about' | 'portfolio' | 'pricing' | 'reviews'>('about');
@@ -151,7 +153,7 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
       return;
     }
     
-    setError('');
+    setInquiryError('');
     setSendingInquiry(true);
 
     try {
@@ -172,10 +174,10 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
         setInquiryMessage('');
         setEventDate('');
       } else {
-        setError('Failed to submit booking inquiry. Please try again.');
+        setInquiryError('Failed to submit booking inquiry. Please try again.');
       }
     } catch (err) {
-      setError('A network error occurred.');
+      setInquiryError('A network error occurred.');
     } finally {
       setSendingInquiry(false);
     }
@@ -185,7 +187,7 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
     e.preventDefault();
     if (!data?.eligibleInquiryId) return;
 
-    setError('');
+    setReviewError('');
     setSubmittingReview(true);
 
     try {
@@ -205,10 +207,10 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
         // Reload details to update review feed and recalculate average
         fetchCreatorDetails();
       } else {
-        setError('Failed to submit review.');
+        setReviewError('Failed to submit review.');
       }
     } catch (err) {
-      setError('Error submitting review.');
+      setReviewError('Error submitting review.');
     } finally {
       setSubmittingReview(false);
     }
@@ -589,6 +591,11 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
                         </div>
                       ) : (
                         <form onSubmit={handleSendReview} className="space-y-4">
+                          {reviewError && (
+                            <div className="p-3 bg-rose-50 text-rose-800 text-xs font-bold rounded-2xl border border-rose-100 text-center">
+                              {reviewError}
+                            </div>
+                          )}
                           <div className="space-y-1">
                             <label className="text-xs font-bold text-stone-600 block">Rating (1 to 5 Stars)</label>
                             <div className="flex items-center gap-1.5">
@@ -674,6 +681,11 @@ export default function CreatorProfilePage({ params }: { params: { id: string } 
                   </div>
                 ) : (
                   <form onSubmit={handleSendInquiry} className="space-y-4">
+                    {inquiryError && (
+                      <div className="p-3 bg-rose-50 text-rose-800 text-[10px] font-bold rounded-xl border border-rose-100 text-center">
+                        {inquiryError}
+                      </div>
+                    )}
                     <h4 className="text-xs font-black text-stone-900 uppercase tracking-widest">Send Booking Inquiry</h4>
                     
                     {/* Select Category Tag */}

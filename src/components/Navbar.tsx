@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +12,20 @@ const Navbar: React.FC = () => {
   const { toggleLanguage, t, language } = useLanguage();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
@@ -62,14 +76,16 @@ const Navbar: React.FC = () => {
 
           {/* Desktop Right Hand buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-stone-100 hover:bg-stone-200/80 text-stone-700 rounded-full border border-stone-200 transition-all hover:scale-105 active:scale-95"
-            >
-              <Globe className="w-3.5 h-3.5 text-amber-600" />
-              <span>{t('langToggleLabel')}</span>
-            </button>
+            {/* Language Toggle - Only standalone when logged out */}
+            {!syncedUser && (
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-stone-100 hover:bg-stone-200/80 text-stone-700 rounded-full border border-stone-200 transition-all hover:scale-105 active:scale-95"
+              >
+                <Globe className="w-3.5 h-3.5 text-amber-600" />
+                <span>{t('langToggleLabel')}</span>
+              </button>
+            )}
 
             {/* Admin Portal link */}
             {syncedUser?.role === 'admin' && (
@@ -105,21 +121,73 @@ const Navbar: React.FC = () => {
                   </>
                 )}
 
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-stone-600 hover:text-rose-600 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>{t('navLogout')}</span>
-                </button>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center gap-1.5 pl-2 border-l border-stone-200 hover:opacity-80 transition-all outline-none"
+                  >
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                      {syncedUser.name ? syncedUser.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                    </div>
+                    <span className="text-xs font-semibold text-stone-700 hidden lg:inline-block max-w-[100px] truncate">
+                      {syncedUser.name || 'User'}
+                    </span>
+                  </button>
 
-                <div className="flex items-center gap-1.5 pl-2 border-l border-stone-200">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                    {syncedUser.name ? syncedUser.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-                  </div>
-                  <span className="text-xs font-semibold text-stone-700 hidden lg:inline-block max-w-[100px] truncate">
-                    {syncedUser.name || 'User'}
-                  </span>
+                  {/* Dropdown Menu */}
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-stone-200 shadow-xl rounded-2xl py-2 z-50 text-stone-800">
+                      
+                      {/* Language section header */}
+                      <div className="px-4 py-1.5 text-[10px] font-black text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-rose-500" />
+                        Language
+                      </div>
+
+                      {/* English option */}
+                      <button
+                        onClick={() => {
+                          if (language !== 'en') toggleLanguage();
+                          setDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-xs font-bold transition-colors flex justify-between items-center ${
+                          language === 'en' ? 'text-rose-600 bg-rose-50/50' : 'text-stone-750 hover:bg-stone-50'
+                        }`}
+                      >
+                        English
+                        {language === 'en' && <span className="text-rose-500">✓</span>}
+                      </button>
+
+                      {/* Hindi option */}
+                      <button
+                        onClick={() => {
+                          if (language !== 'hi') toggleLanguage();
+                          setDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-xs font-bold transition-colors flex justify-between items-center ${
+                          language === 'hi' ? 'text-rose-600 bg-rose-50/50' : 'text-stone-750 hover:bg-stone-50'
+                        }`}
+                      >
+                        हिन्दी
+                        {language === 'hi' && <span className="text-rose-500">✓</span>}
+                      </button>
+
+                      {/* Divider */}
+                      <div className="h-px bg-stone-100 my-1.5" />
+
+                      {/* Logout option */}
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
+                      >
+                        <span className="text-sm">🚪</span>
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
