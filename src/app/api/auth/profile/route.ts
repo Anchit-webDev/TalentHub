@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   let userId: string | null = null;
   try {
+    const prisma = (await import('@/lib/prisma')).default;
     const { searchParams } = new URL(request.url);
     userId = searchParams.get('userId');
 

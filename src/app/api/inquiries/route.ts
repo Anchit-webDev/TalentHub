@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const prisma = (await import('@/lib/prisma')).default;
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -45,6 +45,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const prisma = (await import('@/lib/prisma')).default;
   try {
     const data = await request.json();
     const { creatorId, clientId, category, eventDate, message } = data;
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const prisma = (await import('@/lib/prisma')).default;
   try {
     const data = await request.json();
     const { inquiryId, status } = data; // status: 'accepted' | 'declined' | 'completed'

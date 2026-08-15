@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +7,7 @@ export async function POST(request: Request) {
   let bodyName = 'Mock Client';
   let bodyPhone = '';
   try {
+    const prisma = (await import('@/lib/prisma')).default;
     const { id, name, phone, email } = await request.json();
     bodyId = id;
     bodyName = name || 'Mock Client';

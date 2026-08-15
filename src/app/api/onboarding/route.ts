@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const prisma = (await import('@/lib/prisma')).default;
   try {
     const data = await request.json();
     const {
