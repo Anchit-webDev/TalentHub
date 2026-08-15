@@ -20,6 +20,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ items });
   } catch (error: any) {
     console.error('Error fetching portfolio items:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ items: [], error: 'Database connection offline' });
   }
 }

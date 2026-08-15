@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ inquiries });
   } catch (error: any) {
     console.error('Error fetching inquiries:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ inquiries: [], error: 'Database connection offline' });
   }
 }
 

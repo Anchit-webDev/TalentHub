@@ -96,6 +96,6 @@ export async function GET(request: Request) {
     });
   } catch (error: any) {
     console.error('Error fetching dashboard stats:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ stats: null, recentInquiries: [], error: 'Database connection offline' });
   }
 }

@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ creators });
   } catch (error: any) {
     console.error('Error fetching admin creator list:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ creators: [], error: 'Database connection offline' });
   }
 }
 

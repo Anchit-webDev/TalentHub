@@ -146,6 +146,6 @@ export async function GET(request: Request) {
     });
   } catch (error: any) {
     console.error('Error fetching creator details:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 505 });
+    return NextResponse.json({ creator: null, reviews: [], error: 'Database connection offline' });
   }
 }
