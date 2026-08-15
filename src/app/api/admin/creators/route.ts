@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    const prisma = (await import('@/lib/prisma')).default;
     const creators = await prisma.user.findMany({
       where: { role: 'creator' },
       include: {
@@ -22,6 +22,7 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const prisma = (await import('@/lib/prisma')).default;
     const data = await request.json();
     const { userId, verified } = data;
 
