@@ -125,6 +125,11 @@ const LoginPage: React.FC = () => {
       if (res.ok) {
         const data = await res.json();
 
+        if (!data || !data.user) {
+          setError(data?.error || 'Database connection offline. Please verify database environment variables.');
+          return;
+        }
+
         const role = data.user.role;
 
         if (role === 'admin') {

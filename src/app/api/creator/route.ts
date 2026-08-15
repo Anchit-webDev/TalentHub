@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         name: 'Priya Mehandi Designer',
         city: 'Delhi NCR',
         phone: '+919876543210',
-        creatorProfile: {
+        profile: {
           userId: id,
           categories: ['Mehndi Artist', 'Bridal Makeup'],
           bio: 'Specialist in beautiful designer bridal mehndi, Arabic mehndi patterns, and traditional festival mehndi layouts. Over 5 years of verified experience styling top weddings in Delhi NCR.',
